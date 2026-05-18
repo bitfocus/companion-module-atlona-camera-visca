@@ -1536,9 +1536,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"atlona-visca@workspace:.":
+"atlona-camera-visca@workspace:.":
   version: 0.0.0-use.local
-  resolution: "atlona-visca@workspace:."
+  resolution: "atlona-camera-visca@workspace:."
   dependencies:
     "@companion-module/base": "npm:^2.0.4"
     "@companion-module/tools": "npm:^3.0.1"
