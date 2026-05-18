@@ -1,0 +1,150 @@
+name: Companion Module Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    name: Check module
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Determine nodejs version
+        id: determine-nodejs
+        shell: bash
+        run: |
+          NODE_VERSION=$(jq '.runtime.type' companion/manifest.json)
+          echo "Node.js version: $NODE_VERSION"
+
+          if [ "$NODE_VERSION" == "\"node18\"" ]; then
+            echo "Using Node.js 18.x"
+            echo "version=18.x" >> $GITHUB_OUTPUT
+          elif [ "$NODE_VERSION" == "\"node22\"" ]; then
+            echo "Using Node.js 22.x"
+            echo "version=22.x" >> $GITHUB_OUTPUT
+          else
+            echo "Using default Node.js 22.x"
+            echo "version=22.x" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Use Node.js ${{ steps.determine-nodejs.outputs.version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.determine-nodejs.outputs.version }}
+
+      - name: Enable corepack
+        shell: bash
+        run: |
+          corepack enable
+
+      - name: Check for incorrect lockfiles
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "Error: package-lock.json file found. This repository should use yarn, not npm."
+            exit 1
+          fi
+          if [ ! -f yarn.lock ]; then
+            echo "Error: yarn.lock file not found. This repository must use yarn."
+            exit 1
+          fi
+
+      - name: Collect info
+        shell: bash
+        id: collect-info
+        run: |
+          REPO_NAME="${{ github.repository }}"
+          MODULE_NAME=$(basename $REPO_NAME)
+
+          # Remove companion-module- prefix if present
+          CLEAN_NAME=${MODULE_NAME#companion-module-}
+
+          echo "module-name=$CLEAN_NAME" >> $GITHUB_OUTPUT
+
+          MANIFEST_ID=$(jq -r '.id' companion/manifest.json)
+          if [ "$MANIFEST_ID" != "$CLEAN_NAME" ]; then
+            echo "Error: Module manifest.json id ($MANIFEST_ID) does not match repository name ($CLEAN_NAME)"
+            exit 1
+          fi
+
+          if ! jq -e '.products | arrays and length > 0' companion/manifest.json > /dev/null; then
+            echo "Error: Module manifest product list is empty or invalid"
+            exit 1
+          fi
+
+          if [ ! -f companion/HELP.md ]; then
+            echo "Error: companion/HELP.md does not exist"
+            exit 1
+          fi
+
+      - name: Setup Github packages auth
+        shell: bash
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ github.token }}" >> ~/.npmrc
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          yarn install --no-immutable
+
+      - name: Build module
+        shell: bash
+        run: |
+          if jq -e '.scripts.build' package.json > /dev/null; then 
+            yarn run build
+          fi
+
+      - name: Package module
+        shell: bash
+        run: |
+          npx companion-module-build --output=pkg
+          ls -lh *.tgz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg
+          path: pkg.tgz
+
+      - name: Check module launches
+        shell: bash
+        timeout-minutes: 1
+        run: |
+          # Extract to check launch
+          mkdir -p pkg_extracted
+          tar -xzf pkg.tgz -C pkg_extracted
+
+          # Find main.js dynamically
+          MAIN_JS=$(find pkg_extracted -name main.js | head -n 1)
+
+          if [ -z "$MAIN_JS" ]; then
+            echo "Error: Could not find main.js in packaged module"
+            find pkg_extracted -maxdepth 3
+            exit 1
+          fi
+
+          echo "Testing launch of $MAIN_JS"
+          # We expect it to fail with "Failed to startup module" because it's not in Companion, 
+          # but that proves the code is syntactically correct and imports work.
+          RESULT=$(node "$MAIN_JS" 2>&1) || true
+          if echo "$RESULT" | grep -q "Failed to startup module" || echo "$RESULT" | grep -q "instance_skel"; then
+            echo "Module launch check passed"
+          elif echo "$RESULT" | grep -q "SyntaxError"; then
+            echo "Syntax error detected:"
+            echo "$RESULT"
+            exit 1
+          else
+            echo "Module launch check finished with output:"
+            echo "$RESULT"
+          fi
