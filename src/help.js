@@ -43,9 +43,17 @@ let markdown =
 	'- **Dynamic Focus (Up/Down):**\n' +
 	'  Features intelligent acceleration based on turn speed. Fast turns result in large focus steps to quickly reach the general focus plane, while slow turns allow for highly precise fine-tuning.\n' +
 	'- **White Balance Cycle (Preview):**\n' +
-	'  Allows you to step through white balance modes and preview the mode name before confirming and applying the change.\n'
-
-markdown +=
+	'  Allows you to step through white balance modes and preview the mode name before confirming and applying the change.\n' +
+	'// <premium>\n' +
+	'- **Contextual Rotary Action:**\n' +
+	'  Allows you to define multi-purpose rotary slots that change their behavior dynamically based on camera state. For example, a single rotary can control Focus when in Manual mode, but switch to Zoom when in Auto mode. These actions now also support **Press** and **Release** events in addition to turning.\n' +
+	'- **Snapshot Presets (Parameter Emulation):**\n' +
+	'  This feature allows you to save and recall more than just the camera position. When enabled, it captures Exposure, White Balance, and Image settings locally in the module.\n' +
+	'  - If **Enable Parameter Snapshots in Presets** is enabled in the configuration:\n' +
+	'    - **Saving a Preset:** Always stores a full snapshot of current Exposure, WB, and Image parameters locally.\n' +
+	'    - **Recalling a Preset:** The “Recall Preset” action now features checkboxes to selectively decide which parameter groups to restore (Position, Exposure, White Balance, Image).\n' +
+	'    - **Recall Delay:** You can specify a delay (default 200ms) for sending the additional parameters after the initial position recall.\n' +
+	'// </premium>\n' +
 	'- **Image Calibration (Press to Reset):**\n' +
 	'  All Image Parameter buttons (Labels, Rotaries, and Standard Adjustments) support a quick-calibration feature. A simple **Press** on these buttons immediately sets the image to a optimized “Sweet Spot” configuration.\n' +
 	'\n' +
@@ -54,7 +62,26 @@ markdown +=
 	'The module automatically tracks changes made outside of Companion (e.g., via IR Remote):\n' +
 	'\n' +
 	'- **VISCA Parameters** (Iris, Shutter, Gain, WB): Updated every ~2 seconds.\n' +
-	'- **PTZ Positions**: Updated every ~200ms (High Priority).\n'
+	'- **PTZ Positions**: Updated every ~200ms (High Priority).\n' +
+	'// <premium>\n' +
+	'\n' +
+	'### Smart Tagging Workflow\n' +
+	'\n' +
+	'With Companion 4.3 or newer, you can use our advanced “Smart Tagging” presets to dynamically name your presets without creating a huge mess of custom variables.\n' +
+	'\n' +
+	'**How to use:**\n' +
+	'\n' +
+	'1. In the Atlona module configuration, set the **“Smart Tagging Page”** to the page number where you want to place your Tag buttons (e.g., page 99).\n' +
+	'2. Go to the Buttons tab and navigate to page 1 (or wherever your presets live). Drag and drop the **“Smart Tagged Camera Preset”** buttons from the *Smart Tagging* preset category.\n' +
+	'3. Navigate to your defined Tagging Page (e.g., page 99) and drag and drop the **“Smart Tag: [Name]”** templates onto this page. Edit their text and internal values as you see fit (e.g. “Singer”, “Guitar”, etc.).\n' +
+	'\n' +
+	'**How it works:**\n' +
+	'\n' +
+	'- A short press on the Camera Preset recalls the preset.\n' +
+	'- A 700ms hold saves the preset.\n' +
+	'- A 2200ms hold saves the button’s coordinates to a single background variable (`tag_loc`) and automatically jumps to your Smart Tagging Page.\n' +
+	'- Pressing any Tag button on the tagging page will inject the tag text directly into the local variable of the camera preset button you came from, and automatically jump you back to where you started!\n' +
+	'// </premium>\n'
 
 if (actions.getActionsMarkdown()) {
 	markdown += '\n' + actions.getActionsMarkdown()

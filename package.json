@@ -1,36 +1,36 @@
 ﻿{
-    "name":  "atlona-camera-visca",
     "version":  "0.9.1",
-    "author":  "Tom Lehmann \u003ctom@mailc.de\u003e",
-    "main":  "src/main.js",
+    "license":  "MIT",
+    "dependencies":  {
+                         "@companion-module/base":  "^2.0.4"
+                     },
+    "prettier":  "@companion-module/tools/.prettierrc.json",
+    "name":  "atlona-camera-visca",
     "type":  "module",
+    "description":  "Bitfocus Companion module for Atlona VISCA cameras",
+    "engines":  {
+                    "yarn":  "^4",
+                    "node":  "\u003e=22",
+                    "npm":  "please-use-yarn"
+                },
+    "packageManager":  "yarn@4.9.1",
+    "author":  "Tom Lehmann \u003ctom@mailc.de\u003e",
     "scripts":  {
-                    "test":  "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+                    "docs":  "node src/help.js",
                     "format":  "prettier -w .",
                     "lint:raw":  "eslint",
                     "lint":  "yarn lint:raw .",
-                    "docs":  "node src/help.js"
+                    "test":  "node --experimental-vm-modules node_modules/jest/bin/jest.js"
                 },
-    "license":  "MIT",
     "repository":  {
                        "type":  "git",
                        "url":  "https://github.com/bitfocus/companion-module-atlona-camera-visca.git"
                    },
-    "engines":  {
-                    "npm":  "please-use-yarn",
-                    "yarn":  "^4",
-                    "node":  "\u003e=22"
-                },
-    "dependencies":  {
-                         "@companion-module/base":  "^2.0.4"
-                     },
     "devDependencies":  {
                             "@companion-module/tools":  "^3.0.1",
-                            "eslint":  "^10.4.0",
                             "jest":  "^30.4.2",
-                            "prettier":  "^3.8.3"
+                            "prettier":  "^3.8.3",
+                            "eslint":  "^10.4.0"
                         },
-    "prettier":  "@companion-module/tools/.prettierrc.json",
-    "packageManager":  "yarn@4.9.1",
-    "description":  "Bitfocus Companion module for Atlona VISCA cameras"
+    "main":  "src/main.js"
 }
