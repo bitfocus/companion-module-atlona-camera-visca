@@ -1,5 +1,5 @@
 {
-	"name": "atlona-visca",
+	"name": "atlona-camera-visca",
 	"version": "0.9.1",
 	"author": "Tom Lehmann <tom@mailc.de>",
 	"main": "src/main.js",

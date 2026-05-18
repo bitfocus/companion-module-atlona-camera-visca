@@ -1,8 +1,8 @@
 {
-	"id": "atlona",
+	"id": "atlona-camera-visca",
 	"type": "connection",
-	"name": "atlona",
-	"shortname": "atlona",
+	"name": "atlona-camera-visca",
+	"shortname": "atlona-camera-visca",
 	"description": "Atlona VISCA PTZ Camera Control",
 	"version": "0.9.1",
 	"license": "MIT",
