@@ -10,7 +10,7 @@ export const MSG_INQUIRY = 0x09
 
 // Categories
 export const CAT_LENS = 0x04
-export const CAT_CAMERA = 0x05
+export const CAT_CAMERA = 0x04
 export const CAT_PAN_TILT = 0x06
 
 // Commands - Lens
