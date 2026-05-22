@@ -1,0 +1,74 @@
+name: Release Module
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Determine nodejs version
+        id: determine-nodejs
+        shell: bash
+        run: |
+          NODE_VERSION=$(jq '.runtime.type' companion/manifest.json)
+          echo "Node.js version: $NODE_VERSION"
+
+          if [ "$NODE_VERSION" == "\"node18\"" ]; then
+            echo "version=18.x" >> $GITHUB_OUTPUT
+          elif [ "$NODE_VERSION" == "\"node22\"" ]; then
+            echo "version=22.x" >> $GITHUB_OUTPUT
+          else
+            echo "version=22.x" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Use Node.js ${{ steps.determine-nodejs.outputs.version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.determine-nodejs.outputs.version }}
+
+      - name: Enable corepack
+        shell: bash
+        run: |
+          corepack enable
+
+      - name: Setup Github packages auth
+        shell: bash
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ github.token }}" >> ~/.npmrc
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          yarn install --no-immutable
+
+      - name: Package module
+        shell: bash
+        run: |
+          npx companion-module-build --output=pkg
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: pkg.tgz
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
