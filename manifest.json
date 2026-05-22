@@ -4,7 +4,7 @@
 	"name": "atlona",
 	"shortname": "atlona",
 	"description": "Atlona VISCA PTZ Camera Control",
-	"version": "0.9.1",
+	"version": "0.9.2",
 	"license": "MIT",
 	"repository": "https://github.com/tom-niddatal/companion-module-atlona-visca",
 	"bugs": "https://github.com/tom-niddatal/companion-module-atlona-visca/issues",
