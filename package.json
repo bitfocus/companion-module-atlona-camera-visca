@@ -31,6 +31,6 @@
 		"prettier": "^3.8.3"
 	},
 	"prettier": "@companion-module/tools/.prettierrc.json",
-	"packageManager": "yarn@4.9.1",
+	"packageManager": "yarn@4.13.0",
 	"description": "Bitfocus Companion module for Atlona VISCA cameras"
 }
